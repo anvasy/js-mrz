@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>MRZ L2</title>
+    <script src="logic.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="optionsDiv">
+    <p>
+        <h3> Вариант 4. </h3>
+        <strong>p:</strong> &nbsp&nbsp&nbsp <input id="pNum" pattern="^[1-9]*([0-9]+)$" ><br>
+    </p>
+    <p>
+        <strong>m:</strong> &nbsp&nbsp <input id="mNum" pattern="^[1-9]*([0-9]+)$"><br>
+    </p>
+    <p>
+        <strong>q:</strong> &nbsp&nbsp&nbsp <input id="qNum" pattern="^[1-9]*([0-9]+)$"><br>
+    </p>
+    <p>
+        <strong>n:</strong> &nbsp&nbsp&nbsp <input id="nNum" pattern="^[1-9]*([0-9]+)$"><br>
+    </p>
+    <p>
+        <strong>comparison time:</strong> &nbsp&nbsp&nbsp&nbsp <input id="compareTime" pattern="^[1-9]*([0-9]+)$"><br>
+    </p>
+    <p>
+        <strong>composition time:</strong> &nbsp&nbsp&nbsp <input id="compositTime" pattern="^[1-9]*([0-9]+)$"><br>
+    </p>
+    <p>
+        <strong>sum time:</strong> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp <input id="sumTime" pattern="^[1-9]*([0-9]+)$"><br>
+    </p>
+    <button class="mainBtn" onclick="letItGo()">Начать</button>
+</div>
+    <table id="mainTable" border='1'>
+    </table>
+</body>
+</html>
