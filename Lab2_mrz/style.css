@@ -1,4 +1,4 @@
-button.mainBtn {
+button {
     font-weight: bold;
     color: white;
     padding: .8em 1em calc(.8em + 3px);
@@ -6,10 +6,10 @@ button.mainBtn {
     background: #297a62;
     transition: 0.2s;
 }
-button.mainBtn:hover {
+button:hover {
   background: rgb(111, 229, 113); 
 }
-button.mainBtn:active {
+button:active {
     background: rgb(111, 229, 113);
 }
 

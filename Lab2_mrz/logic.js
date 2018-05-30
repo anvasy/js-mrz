@@ -8,6 +8,10 @@ var p = 0;
 var m = 0;
 var q = 0
 var n = 0;
+var Knr = 0;
+var Enr = 0;
+var Dnr = 0;
+var L = 0;
 var sumTime = 0;
 var compositionTime = 0;
 var comparisonTime = 0;
@@ -17,6 +21,7 @@ var sumAmount = 0;
 var comparisonAmount = 0;
 var T1 = 0;
 var Tn = 0;
+var totalRang = 0;
 
 //created by: Vasilyeva
 
@@ -32,14 +37,19 @@ function letItGo() {
 
     T1 = 0;
     Tn = 0;
+    Knr = 0;
+    Enr = 0;
+    Dnr = 0;
+    L = 0;
 
     if (rightInput() == 0)
         return;
         
     generateData();
 
-    dMatrix();
     cMatrix();
+    calculateEnr();
+    calculateD();
 
     if (tableGenerated == 1) {
         var table = document.getElementById('mainTable');
@@ -107,6 +117,7 @@ function rightInput() {
 }
 
 function dMatrix() {
+    D = [];
     for(var i = 0; i < p; i++) {
         D[i] = new Array(); 
         for (var j = 0; j < q; j++) {
@@ -119,6 +130,7 @@ function dMatrix() {
 }
 
 function cMatrix() {
+    dMatrix();
     for(var i = 0; i < p; i++) {
         C[i] = new Array(); 
         for (var j = 0; j < q; j++) {
@@ -151,6 +163,7 @@ function compare(i, j) {
         if(G[x][i] < H[j][x]) {
             T1 += comparisonTime;
             comparisonAmount++;
+            L += 2 * comparisonTime;
             return 1;
         }
     }
@@ -164,6 +177,7 @@ function sumDkij(i, j) {
 
         sumAmount++;
         T1 += sumTime;  
+        L += 2 * sumTime;
     }  
     return sum.toFixed(6);
 } 
@@ -173,12 +187,27 @@ function compositionDkij(i, j) {
     for(var k = 0; k < m; k++) {
         composition = composition * D[i][j][k];
 
+        L += 2 * compositionAmount;
         compositionAmount++;
         T1 += compositionTime;
     }
     return composition.toFixed(6);
 }
 
+function calculateKnr() {
+    Knr = T1 / Tn;
+}
+
+function calculateEnr() {
+    calculateKnr()
+    Enr = Knr / n;
+}
+
+function calculateD() {
+    totalRang = p*m*q;
+    L = L / totalRang;
+    Dnr = Tn / L;
+}
 
 function generateTable() {
 
@@ -277,7 +306,7 @@ function generateTable() {
         matrixTitle = document.createElement('caption');
         matrixTitle.innerHTML = "C:";
         matrix.appendChild(matrixTitle);
-
+        totalRang = m * p * q;
         for (var i = 0; i < p; i++) {
             matrixRow = document.createElement('tr');
             for (var j = 0; j < q; j++) {
@@ -292,9 +321,422 @@ function generateTable() {
 
         tableCell = document.createElement('td');
         tableCell.innerHTML = "Tn: " + Tn + "<br>"
-            + "T1: " + T1;
+            + "T1: " + T1 + "<br>" 
+            + "Ky(n,r) : " + Knr.toFixed(4) + "<br>" 
+            + "e(n,r) : " + Enr.toFixed(4) + "<br>"
+            + "D: " + Dnr.toFixed(4) + "<br>"
+            + "r: " + totalRang;
         tableRow.appendChild(tableCell);
         table.appendChild(tableRow);
 
         document.body.appendChild(table);
 }
+
+////////////////////charts////////////////////////
+/*
+function buildCharts() {
+    A = [];
+    B = [];
+    C = [];
+    G = [];
+    H = [];
+
+    Tn = 0;
+    Knr = 0;
+    Enr = 0;
+    Dnr = 0;
+
+    p = parseInt(document.getElementById('pNum').value);
+    m = parseInt(document.getElementById('mNum').value);
+    q = parseInt(document.getElementById('qNum').value);
+    n = parseInt(document.getElementById('nNum').value);
+    
+    sumTime = parseInt(document.getElementById('sumTime').value);
+    compositionTime = parseInt(document.getElementById('compositTime').value);
+    comparisonTime = parseInt(document.getElementById('compareTime').value);
+
+    T1 = 1;
+    document.body.innerHTML = "<div id=\"chart1\"></div>";
+    document.body.innerHTML += "<div id=\"chart2\"></div>";
+    document.body.innerHTML += "<div id=\"chart3\"></div>";
+    document.body.innerHTML += "<div id=\"chart4\"></div>";
+    document.body.innerHTML += "<div id=\"chart5\"></div>";
+    document.body.innerHTML += "<div id=\"chart6\"></div>";
+
+    google.charts.load('current', {'packages': ['line']});
+    google.charts.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+
+        var benchmark = [];
+
+
+        var RBenchmark = [];
+        for (m = 1; m < 21; m++) {
+            RBenchmark[m - 1] = new Array();
+            generateData();
+            RBenchmark[m - 1].push(A);
+            RBenchmark[m - 1].push(B);
+        }
+
+
+        for (n = 1; n < 71; n++) {
+            benchmark[n - 1] = new Array();
+            benchmark[n - 1].push(n);
+            for (m = 1; m < 21; m++) {
+                A = RBenchmark[m - 1][0];
+                B = RBenchmark[m - 1][1];
+                C = [];
+                Tn = 0;
+                T1 = 0;
+                Knr = 0;
+                Enr = 0;
+                Dnr = 0;
+                cMatrix();
+                calculateEnr();
+                benchmark[n - 1].push(Knr);
+            }
+        }
+
+
+        var data = new google.visualization.DataTable();
+        data.addColumn('number', 'n');
+        data.addColumn('number', '1');
+        data.addColumn('number', '2');
+        data.addColumn('number', '3');
+        data.addColumn('number', '4');
+        data.addColumn('number', '5');
+        data.addColumn('number', '6');
+        data.addColumn('number', '7');
+        data.addColumn('number', '8');
+        data.addColumn('number', '9');
+        data.addColumn('number', '10');
+        data.addColumn('number', '11');
+        data.addColumn('number', '12');
+        data.addColumn('number', '13');
+        data.addColumn('number', '14');
+        data.addColumn('number', '15');
+        data.addColumn('number', '16');
+        data.addColumn('number', '17');
+        data.addColumn('number', '18');
+        data.addColumn('number', '19');
+        data.addColumn('number', '20');
+
+        data.addRows(benchmark);
+
+        var options = {
+            vAxis: {
+                title: 'K(n,r)'
+            },
+            width: 1347,
+            height: 500
+
+        };
+
+        var chart = new google.charts.Line(document.getElementById('chart1'));
+
+        chart.draw(data, google.charts.Line.convertOptions(options));
+
+        benchmark = [];
+        m = 31;
+        A = [];
+        B = [];
+        G = [];
+        H = [];
+        generateData();
+
+        for (m = 1; m < 31; m++) {
+            benchmark[m - 1] = new Array();
+            benchmark[m - 1].push(m);
+            for (n = 1; n < 21; n++) {
+                C = [];
+                Tn = 0;
+                T1 = 0;
+                Knr = 0;
+                Enr = 0;
+                Dnr = 0;
+                cMatrix();
+                calculateEnr();
+                benchmark[m - 1].push(Knr);
+            }
+        }
+
+        data = new google.visualization.DataTable();
+        data.addColumn('number', 'r');
+        data.addColumn('number', '1');
+        data.addColumn('number', '2');
+        data.addColumn('number', '3');
+        data.addColumn('number', '4');
+        data.addColumn('number', '5');
+        data.addColumn('number', '6');
+        data.addColumn('number', '7');
+        data.addColumn('number', '8');
+        data.addColumn('number', '9');
+        data.addColumn('number', '10');
+        data.addColumn('number', '11');
+        data.addColumn('number', '12');
+        data.addColumn('number', '13');
+        data.addColumn('number', '14');
+        data.addColumn('number', '15');
+        data.addColumn('number', '16');
+        data.addColumn('number', '17');
+        data.addColumn('number', '18');
+        data.addColumn('number', '19');
+        data.addColumn('number', '20');
+
+        data.addRows(benchmark);
+
+        options = {
+            vAxis: {
+                title: 'K(n,r)'
+            },
+            width: 1347,
+            height: 500
+
+        };
+
+        chart = new google.charts.Line(document.getElementById('chart2'));
+        chart.draw(data, google.charts.Line.convertOptions(options));
+
+        benchmark = [];
+        m = 31;
+        A = [];
+        B = [];
+        G = [];
+        H = [];
+        generateData();
+
+        for (m = 1; m < 31; m++) {
+            benchmark[m - 1] = new Array();
+            benchmark[m - 1].push(m);
+            for (n = 1; n < 21; n++) {
+                C = [];
+
+                Tn = 0;
+                T1 = 0;
+                Knr = 0;
+                Enr = 0;
+                Dnr = 0;
+                cMatrix();
+                calculateEnr();
+                benchmark[m - 1].push(Enr);
+            }
+        }
+
+        data = new google.visualization.DataTable();
+        data.addColumn('number', 'r');
+        data.addColumn('number', '1');
+        data.addColumn('number', '2');
+        data.addColumn('number', '3');
+        data.addColumn('number', '4');
+        data.addColumn('number', '5');
+        data.addColumn('number', '6');
+        data.addColumn('number', '7');
+        data.addColumn('number', '8');
+        data.addColumn('number', '9');
+        data.addColumn('number', '10');
+        data.addColumn('number', '11');
+        data.addColumn('number', '12');
+        data.addColumn('number', '13');
+        data.addColumn('number', '14');
+        data.addColumn('number', '15');
+        data.addColumn('number', '16');
+        data.addColumn('number', '17');
+        data.addColumn('number', '18');
+        data.addColumn('number', '19');
+        data.addColumn('number', '20');
+
+        data.addRows(benchmark);
+
+        options = {
+            vAxis: {
+                title: 'E(n,r)'
+            },
+            width: 1347,
+            height: 500
+
+        };
+
+        chart = new google.charts.Line(document.getElementById('chart3'));
+        chart.draw(data, google.charts.Line.convertOptions(options));
+
+        benchmark = [];
+        for (n = 1; n < 31; n++) {
+            benchmark[n - 1] = new Array();
+            benchmark[n - 1].push(n);
+            for (m = 1; m < 21; m++) {
+                A = RBenchmark[m - 1][0];
+                B = RBenchmark[m - 1][1];
+                C = [];
+
+                Tn = 0;
+                T1 = 0;
+                Knr = 0;
+                Enr = 0;
+                Dnr = 0;
+                cMatrix();
+                calculateEnr();
+                benchmark[n - 1].push(Enr);
+            }
+        }
+
+        data = new google.visualization.DataTable();
+        data.addColumn('number', 'n');
+        data.addColumn('number', '1');
+        data.addColumn('number', '2');
+        data.addColumn('number', '3');
+        data.addColumn('number', '4');
+        data.addColumn('number', '5');
+        data.addColumn('number', '6');
+        data.addColumn('number', '7');
+        data.addColumn('number', '8');
+        data.addColumn('number', '9');
+        data.addColumn('number', '10');
+        data.addColumn('number', '11');
+        data.addColumn('number', '12');
+        data.addColumn('number', '13');
+        data.addColumn('number', '14');
+        data.addColumn('number', '15');
+        data.addColumn('number', '16');
+        data.addColumn('number', '17');
+        data.addColumn('number', '18');
+        data.addColumn('number', '19');
+        data.addColumn('number', '20');
+
+        data.addRows(benchmark);
+
+        options = {
+            vAxis: {
+                title: 'E(n,r)'
+            },
+            width: 1347,
+            height: 500
+
+        };
+
+        chart = new google.charts.Line(document.getElementById('chart4'));
+        chart.draw(data, google.charts.Line.convertOptions(options));
+
+        benchmark = [];
+        m = 31;
+        A = [];
+        B = [];
+        G = [];
+        H = [];
+        generateData();
+        for (m = 1; m < 21; m++) {
+            benchmark[m - 1] = new Array();
+            benchmark[m - 1].push(m);
+            for (n = 1; n < 21; n++) {
+                C = [];
+                L = 0;
+                Tn = 0;
+                T1 = 0;
+                Knr = 0;
+                Enr = 0;
+                Dnr = 0;
+                totalRang = m * p * q;;
+                cMatrix();
+                calculateD();
+                benchmark[m - 1].push(Dnr);
+            }
+        }
+
+        data = new google.visualization.DataTable();
+        data.addColumn('number', 'r');
+        data.addColumn('number', '1');
+        data.addColumn('number', '2');
+        data.addColumn('number', '3');
+        data.addColumn('number', '4');
+        data.addColumn('number', '5');
+        data.addColumn('number', '6');
+        data.addColumn('number', '7');
+        data.addColumn('number', '8');
+        data.addColumn('number', '9');
+        data.addColumn('number', '10');
+        data.addColumn('number', '11');
+        data.addColumn('number', '12');
+        data.addColumn('number', '13');
+        data.addColumn('number', '14');
+        data.addColumn('number', '15');
+        data.addColumn('number', '16');
+        data.addColumn('number', '17');
+        data.addColumn('number', '18');
+        data.addColumn('number', '19');
+        data.addColumn('number', '20');
+
+        data.addRows(benchmark);
+
+        options = {
+            vAxis: {
+                title: 'D(n,r)'
+            },
+            width: 1347,
+            height: 500
+
+        };
+
+        chart = new google.charts.Line(document.getElementById('chart5'));
+
+        chart.draw(data, google.charts.Line.convertOptions(options));
+        benchmark = [];
+        for (n = 1; n < 51; n++) {
+            benchmark[n - 1] = new Array();
+            benchmark[n - 1].push(n);
+            for (m = 1; m < 21; m++) {
+                A = RBenchmark[m - 1][0];
+                B = RBenchmark[m - 1][1];
+                C = [];
+
+                L = 0;
+                Tn = 0;
+                T1 = 0;
+                Knr = 0;
+                Enr = 0;
+                Dnr = 0;
+                totalRang = m * p * q;
+                cMatrix();
+                calculateD();
+                benchmark[n - 1].push(Dnr);
+            }
+        }
+
+        data = new google.visualization.DataTable();
+        data.addColumn('number', 'n');
+        data.addColumn('number', '1');
+        data.addColumn('number', '2');
+        data.addColumn('number', '3');
+        data.addColumn('number', '4');
+        data.addColumn('number', '5');
+        data.addColumn('number', '6');
+        data.addColumn('number', '7');
+        data.addColumn('number', '8');
+        data.addColumn('number', '9');
+        data.addColumn('number', '10');
+        data.addColumn('number', '11');
+        data.addColumn('number', '12');
+        data.addColumn('number', '13');
+        data.addColumn('number', '14');
+        data.addColumn('number', '15');
+        data.addColumn('number', '16');
+        data.addColumn('number', '17');
+        data.addColumn('number', '18');
+        data.addColumn('number', '19');
+        data.addColumn('number', '20');
+
+        data.addRows(benchmark);
+
+        options = {
+            vAxis: {
+                title: 'D(n,r)'
+            },
+            width: 1347,
+            height: 500
+
+        };
+
+        chart = new google.charts.Line(document.getElementById('chart6'));
+        chart.draw(data, google.charts.Line.convertOptions(options));
+
+    }
+} */
