@@ -123,13 +123,20 @@ function dMatrix() {
         for (var j = 0; j < q; j++) {
             D[i][j] = new Array();
             for (var k = 0; k < m; k++) {
-                D[i][j][k] =(A[i][k] * B[k][j]).toFixed(6);
+                D[i][j][k] = (A[i][k] * B[k][j]).toFixed(6);
+                L += 2 * compositionTime;
+                T1+=compositionTime;
+                compositionAmount++;
             }
         }
     }
 }
 
 function cMatrix() {
+    compositionAmount = 0;
+    sumAmount = 0;
+    comparisonAmount = 0;
+
     dMatrix();
     for(var i = 0; i < p; i++) {
         C[i] = new Array(); 
@@ -137,12 +144,13 @@ function cMatrix() {
             C[i][j] = findCij(i, j);
         }
     }
+
+    Tn += Math.ceil(compositionAmount/ n) * compositionTime;
+    Tn += Math.ceil(sumAmount/ n) * sumTime;
+    Tn += Math.ceil(comparisonAmount / n) * comparisonTime;
 }
 
 function findCij(i, j) {
-    compositionAmount = 0;
-    sumAmount = 0;
-    comparisonAmount = 0;
 
     var Cij = 0;
     if(compare(i, j) == 1) {
@@ -150,11 +158,6 @@ function findCij(i, j) {
     } else {
         Cij = sumDkij(i, j);
     }
-
-    Tn += Math.ceil(compositionAmount/ n) * compositionTime;
-    Tn += Math.ceil(sumAmount/ n) * sumTime;
-    Tn += Math.ceil(comparisonAmount / n) * comparisonTime;
-
     return Cij;
 }
 
@@ -175,9 +178,10 @@ function sumDkij(i, j) {
     for(var k = 0; k < m; k++) {
         sum +=  parseFloat(D[i][j][k]);
 
+        L += 2 * sumTime;
         sumAmount++;
         T1 += sumTime;  
-        L += 2 * sumTime;
+        
     }  
     return sum.toFixed(6);
 } 
@@ -187,7 +191,7 @@ function compositionDkij(i, j) {
     for(var k = 0; k < m; k++) {
         composition = composition * D[i][j][k];
 
-        L += 2 * compositionAmount;
+        L += 2 * compositionTime;
         compositionAmount++;
         T1 += compositionTime;
     }
@@ -206,6 +210,7 @@ function calculateEnr() {
 function calculateD() {
     totalRang = p*m*q;
     L = L / totalRang;
+    console.log(L);
     Dnr = Tn / L;
 }
 
@@ -333,7 +338,7 @@ function generateTable() {
 }
 
 ////////////////////charts////////////////////////
-/*
+
 function buildCharts() {
     A = [];
     B = [];
@@ -739,4 +744,4 @@ function buildCharts() {
         chart.draw(data, google.charts.Line.convertOptions(options));
 
     }
-} */
+} 
