@@ -41,6 +41,7 @@ function letItGo() {
     Enr = 0;
     Dnr = 0;
     L = 0;
+    totalRang = 0;
 
     if (rightInput() == 0)
         return;
@@ -125,11 +126,14 @@ function dMatrix() {
             for (var k = 0; k < m; k++) {
                 D[i][j][k] = (A[i][k] * B[k][j]).toFixed(6);
                 L += 2 * compositionTime;
+                totalRang += 2;
                 T1+=compositionTime;
                 compositionAmount++;
             }
         }
     }
+    Tn += Math.ceil(compositionAmount/ n) * compositionTime;
+    comparisonAmount = 0;
 }
 
 function cMatrix() {
@@ -163,10 +167,12 @@ function findCij(i, j) {
 
 function compare(i, j) {
     for(var x = 0; x < m; x++) {
+        T1 += comparisonTime;
+        comparisonAmount++;
+        L += 2 * comparisonTime;
+        totalRang += 2;
         if(G[x][i] < H[j][x]) {
-            T1 += comparisonTime;
-            comparisonAmount++;
-            L += 2 * comparisonTime;
+            
             return 1;
         }
     }
@@ -177,8 +183,8 @@ function sumDkij(i, j) {
     var sum = 0;
     for(var k = 0; k < m; k++) {
         sum +=  parseFloat(D[i][j][k]);
-
-        L += 2 * sumTime;
+        totalRang += 1;
+        L += 1 * sumTime;
         sumAmount++;
         T1 += sumTime;  
         
@@ -190,8 +196,8 @@ function compositionDkij(i, j) {
     var composition = 1;
     for(var k = 0; k < m; k++) {
         composition = composition * D[i][j][k];
-
-        L += 2 * compositionTime;
+        totalRang += 1;
+        L += 1 * compositionTime;
         compositionAmount++;
         T1 += compositionTime;
     }
@@ -208,9 +214,8 @@ function calculateEnr() {
 }
 
 function calculateD() {
-    totalRang = p*m*q;
+    console.log(totalRang);
     L = L / totalRang;
-    console.log(L);
     Dnr = Tn / L;
 }
 
@@ -311,7 +316,6 @@ function generateTable() {
         matrixTitle = document.createElement('caption');
         matrixTitle.innerHTML = "C:";
         matrix.appendChild(matrixTitle);
-        totalRang = m * p * q;
         for (var i = 0; i < p; i++) {
             matrixRow = document.createElement('tr');
             for (var j = 0; j < q; j++) {
