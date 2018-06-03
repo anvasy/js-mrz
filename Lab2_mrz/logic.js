@@ -157,11 +157,7 @@ function cMatrix() {
 function findCij(i, j) {
 
     var Cij = 0;
-    if(compare(i, j) == 1) {
-        Cij = compositionDkij(i, j);
-    } else {
-        Cij = sumDkij(i, j);
-    }
+    Cij = compare(i, j);
     return Cij;
 }
 
@@ -171,12 +167,11 @@ function compare(i, j) {
         comparisonAmount++;
         L += 2 * comparisonTime;
         totalRang += 2;
-        if(G[x][i] < H[j][x]) {
-            
-            return 1;
+        if(G[x][i] < H[j][x]) {          
+            return compositionDkij(i, j);
         }
     }
-    return 0;
+    return sumDkij(i, j);
 }
 
 function sumDkij(i, j) {
@@ -214,7 +209,6 @@ function calculateEnr() {
 }
 
 function calculateD() {
-    console.log(totalRang);
     L = L / totalRang;
     Dnr = Tn / L;
 }
