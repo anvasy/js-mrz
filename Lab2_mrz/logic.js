@@ -21,6 +21,8 @@ var sumAmount = 0;
 var comparisonAmount = 0;
 var T1 = 0;
 var Tn = 0;
+var compareRange = 0;
+var copmositionRange = 0;
 var totalRang = 0;
 
 //created by: Vasilyeva
@@ -30,7 +32,7 @@ function letItGo() {
     m = document.getElementById('mNum').value;
     q = document.getElementById('qNum').value;
     n = document.getElementById('nNum').value;
-    
+
     sumTime = document.getElementById('sumTime').value;
     compositionTime = document.getElementById('compositTime').value;
     comparisonTime = document.getElementById('compareTime').value;
@@ -42,10 +44,12 @@ function letItGo() {
     Dnr = 0;
     L = 0;
     totalRang = 0;
+    compareRange = 0;
+    copmositionRange = 0;
 
     if (rightInput() == 0)
         return;
-        
+
     generateData();
 
     cMatrix();
@@ -88,7 +92,7 @@ function generateData() {
             G[i][j] = (2 * Math.random() - 1).toFixed(6);
         }
     }
-    
+
     for (var i = 0; i < q; i++) {
         H[i] = new Array();
         for (var j = 0; j < m; j++) {
@@ -99,13 +103,13 @@ function generateData() {
 
 function rightInput() {
     if (p == "" || m == "" || q == "" || n == "" || sumTime == "" || comparisonTime == "" || compositionTime == "") {
-        alert('Заоплните все поля.');
+        alert('Заполните все поля.');
         return 0;
     }
 
-   if (!p.match(/^\d+$/) || !m.match(/^\d+$/) || !q.match(/^\d+$/) || !n.match(/^\d+$/) || !sumTime.match(/^\d+$/) || !comparisonTime.match(/^\d+$/) 
-   || !compositionTime.match(/^\d+$/) || /^0/.test(p) || /^0/.test(m) || /^0/.test(q) || /^0/.test(n) || /^0/.test(compositionTime) 
-   || /^0/.test(compositionTime) || /^0/.test(sumTime)) {
+    if (!p.match(/^\d+$/) || !m.match(/^\d+$/) || !q.match(/^\d+$/) || !n.match(/^\d+$/) || !sumTime.match(/^\d+$/) || !comparisonTime.match(/^\d+$/)
+        || !compositionTime.match(/^\d+$/) || /^0/.test(p) || /^0/.test(m) || /^0/.test(q) || /^0/.test(n) || /^0/.test(compositionTime)
+        || /^0/.test(compositionTime) || /^0/.test(sumTime)) {
         alert("Неверные значения.");
         return 0;
     }
@@ -120,20 +124,21 @@ function rightInput() {
 function dMatrix() {
     D = [];
     for(var i = 0; i < p; i++) {
-        D[i] = new Array(); 
+        D[i] = new Array();
         for (var j = 0; j < q; j++) {
             D[i][j] = new Array();
             for (var k = 0; k < m; k++) {
                 D[i][j][k] = (A[i][k] * B[k][j]).toFixed(6);
                 L += 2 * compositionTime;
-                totalRang += 2;
+                //totalRang += 2;
                 T1+=compositionTime;
                 compositionAmount++;
             }
         }
     }
     Tn += Math.ceil(compositionAmount/ n) * compositionTime;
-    comparisonAmount = 0;
+    compositionAmount = 0;
+    copmositionRange = 2;``
 }
 
 function cMatrix() {
@@ -143,19 +148,18 @@ function cMatrix() {
 
     dMatrix();
     for(var i = 0; i < p; i++) {
-        C[i] = new Array(); 
+        C[i] = new Array();
         for (var j = 0; j < q; j++) {
             C[i][j] = findCij(i, j);
         }
     }
 
-    Tn += Math.ceil(compositionAmount/ n) * compositionTime;
-    Tn += Math.ceil(sumAmount/ n) * sumTime;
+    //Tn += Math.ceil(compositionAmount/ n) * compositionTime;
+    //Tn += Math.ceil(sumAmount/ n) * sumTime;
     Tn += Math.ceil(comparisonAmount / n) * comparisonTime;
 }
 
 function findCij(i, j) {
-
     var Cij = 0;
     Cij = compare(i, j);
     return Cij;
@@ -166,8 +170,9 @@ function compare(i, j) {
         T1 += comparisonTime;
         comparisonAmount++;
         L += 2 * comparisonTime;
-        totalRang += 2;
-        if(G[x][i] < H[j][x]) {          
+        //totalRang += 2;
+        compareRange +=2;
+        if(G[x][i] < H[j][x]) {
             return compositionDkij(i, j);
         }
     }
@@ -175,26 +180,32 @@ function compare(i, j) {
 }
 
 function sumDkij(i, j) {
+    var sumRang = compareRange;
     var sum = 0;
     for(var k = 0; k < m; k++) {
         sum +=  parseFloat(D[i][j][k]);
-        totalRang += 1;
-        L += 1 * sumTime;
-        sumAmount++;
-        T1 += sumTime;  
-        
-    }  
+        //totalRang += 1;
+        L += sumRang * sumTime;
+        totalRang += sumRang;
+        sumRang += 2;
+        //sumAmount++;
+        T1 += sumTime;
+        Tn += sumTime;
+    }
     return sum.toFixed(6);
-} 
+}
 
 function compositionDkij(i, j) {
+    var compRang = compareRange;
     var composition = 1;
     for(var k = 0; k < m; k++) {
         composition = composition * D[i][j][k];
-        totalRang += 1;
-        L += 1 * compositionTime;
-        compositionAmount++;
+        totalRang += compRang;
+        L += compRang * compositionTime;
+        //compositionAmount++;
         T1 += compositionTime;
+        Tn += sumTime;
+        compRang += copmositionRange;
     }
     return composition.toFixed(6);
 }
@@ -204,7 +215,7 @@ function calculateKnr() {
 }
 
 function calculateEnr() {
-    calculateKnr()
+    calculateKnr();
     Enr = Knr / n;
 }
 
@@ -306,33 +317,33 @@ function generateTable() {
     tableRow = document.createElement('tr');
 
     tableCell = document.createElement('td');
-        matrix = document.createElement('table');
-        matrixTitle = document.createElement('caption');
-        matrixTitle.innerHTML = "C:";
-        matrix.appendChild(matrixTitle);
-        for (var i = 0; i < p; i++) {
-            matrixRow = document.createElement('tr');
-            for (var j = 0; j < q; j++) {
-                matrixCell = document.createElement('td');
-                matrixCell.innerHTML = C[i][j];
-                matrixRow.appendChild(matrixCell);
-            }
-            matrix.appendChild(matrixRow);
+    matrix = document.createElement('table');
+    matrixTitle = document.createElement('caption');
+    matrixTitle.innerHTML = "C:";
+    matrix.appendChild(matrixTitle);
+    for (var i = 0; i < p; i++) {
+        matrixRow = document.createElement('tr');
+        for (var j = 0; j < q; j++) {
+            matrixCell = document.createElement('td');
+            matrixCell.innerHTML = C[i][j];
+            matrixRow.appendChild(matrixCell);
         }
-        tableCell.appendChild(matrix);
-        tableRow.appendChild(tableCell);
+        matrix.appendChild(matrixRow);
+    }
+    tableCell.appendChild(matrix);
+    tableRow.appendChild(tableCell);
 
-        tableCell = document.createElement('td');
-        tableCell.innerHTML = "Tn: " + Tn + "<br>"
-            + "T1: " + T1 + "<br>" 
-            + "Ky(n,r) : " + Knr.toFixed(4) + "<br>" 
-            + "e(n,r) : " + Enr.toFixed(4) + "<br>"
-            + "D: " + Dnr.toFixed(4) + "<br>"
-            + "r: " + totalRang;
-        tableRow.appendChild(tableCell);
-        table.appendChild(tableRow);
+    tableCell = document.createElement('td');
+    tableCell.innerHTML = "Tn: " + Tn + "<br>"
+        + "T1: " + T1 + "<br>"
+        + "Ky(n,r) : " + Knr.toFixed(4) + "<br>"
+        + "e(n,r) : " + Enr.toFixed(4) + "<br>"
+        + "D: " + Dnr.toFixed(4) + "<br>"
+        + "r: " + totalRang;
+    tableRow.appendChild(tableCell);
+    table.appendChild(tableRow);
 
-        document.body.appendChild(table);
+    document.body.appendChild(table);
 }
 
 ////////////////////charts////////////////////////
@@ -353,7 +364,7 @@ function buildCharts() {
     m = parseInt(document.getElementById('mNum').value);
     q = parseInt(document.getElementById('qNum').value);
     n = parseInt(document.getElementById('nNum').value);
-    
+
     sumTime = parseInt(document.getElementById('sumTime').value);
     compositionTime = parseInt(document.getElementById('compositTime').value);
     comparisonTime = parseInt(document.getElementById('compareTime').value);
