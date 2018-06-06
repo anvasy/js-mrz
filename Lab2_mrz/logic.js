@@ -161,24 +161,114 @@ function cMatrix() {
 
 function findCij(i, j) {
     var Cij = 0;
-    Cij = compare(i, j);
-    return Cij;
+    //Cij = compare(i, j);
+	Cij = calculateCElem(i, j);
+    totalRang += compareRange + 2*m;
+    compareRange = 0;
+    return Cij.toFixed(6);
 }
 
-function compare(i, j) {
+function compare(i, j, Dk) {
     for(var x = 0; x < m; x++) {
         T1 += comparisonTime;
         comparisonAmount++;
         L += 2 * comparisonTime;
-        //totalRang += 2;
-        compareRange +=2;
+        compareRange +=2;      
         if(G[x][i] < H[j][x]) {
-            return compositionDkij(i, j);
+            //return compositionDkij(i, j);
+			return sumArray(Dk, 2);
         }
     }
-    return sumDkij(i, j);
+    //return sumDkij(i, j);
+	return composeArray(Dk, 2);
 }
 
+//////////
+
+function calculateCElem(i, j) {
+    var Dk = [];
+    for (var k = 0; k < D.length; k++) {
+        Dk.push(parseFloat(D[k][i][j]));
+    }
+    //return sumArray(Dk);
+	return compare(i, j, Dk);
+}
+
+function sumArray(D, r) {
+	
+    if (D.length == 1) {
+        var res = D[0];
+		//totalRang += range;
+        return res;
+    } else {
+        var t = 0;
+        var nIter = 0;
+        var isEven = 1;
+        var res = [];
+        if (D.length % 2 === 1) {
+            res.push(D[D.length - 1]);
+            isEven = 0;
+        }
+        for (var i = 0; i < (D.length - D.length % 2); i += 2) {
+            if (nIter === n) {
+                for (var j = i; j < D.length; j++) {
+                    res.push(D[j]);
+                }
+                break;
+            }
+
+            res.push(D[i] + D[i + 1]);
+			sumAmount++;
+            nIter += 1;
+            t += sumTime;
+
+        }
+        if(isEven == 1)
+		  L += sumTime * sumAmount * r;
+        else
+            L += sumTime * sumAmount * r - 1;
+        T1 += t;
+        Tn += Math.ceil(t / n);
+        return (sumArray(res, r * 2));
+    }
+}
+
+function composeArray(D, range) {
+    if (D.length == 1) {
+        var res = D[0];
+        totalRang += range;
+        return res;
+    } else {
+        var t = 0;
+        var nIter = 0;
+        var res = [];
+        if (D.length % 2 === 1) {
+            res.push(D[D.length - 1]);
+        }
+        for (var i = 0; i < (D.length - D.length % 2); i += 2) {
+            if (nIter === n) {
+                for (var j = i; j < D.length; j++) {
+                    res.push(D[j]);
+                }
+                break;
+            }
+
+            res.push(D[i] * D[i + 1]);
+
+            nIter += 1;
+			compositionAmount++;
+            t += compositionTime;
+
+        }
+        T1 += t;
+        Tn += Math.ceil(t / n);
+		L += compositionTime * compositionAmount * range;
+        return (composeArray(res, range * 2));
+    }
+}
+
+//////////
+/*
 function sumDkij(i, j) {
     var sumRang = compareRange;
     var sum = 0;
@@ -208,7 +298,7 @@ function compositionDkij(i, j) {
         compRang += copmositionRange;
     }
     return composition.toFixed(6);
-}
+}*/
 
 function calculateKnr() {
     Knr = T1 / Tn;
